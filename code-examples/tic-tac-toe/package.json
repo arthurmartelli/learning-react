@@ -2,11 +2,11 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^1.1.5"
   },
   "main": "./src/index.js",
   "devDependencies": {
-    "react-scripts": "1.0.0"
+    "react-scripts": "1.1.5"
   },
   "name": "tic_tac_toe",
   "description": "Tic-Tac-Toe App",
