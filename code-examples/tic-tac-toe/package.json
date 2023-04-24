@@ -6,7 +6,7 @@
   },
   "main": "./src/index.js",
   "devDependencies": {
-    "react-scripts": "1.0.0"
+    "react-scripts": "5.0.1"
   },
   "name": "tic_tac_toe",
   "description": "Tic-Tac-Toe App",
