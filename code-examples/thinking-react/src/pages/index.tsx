@@ -1,27 +1,31 @@
-import Head from "next/head";
-import { Inter } from "next/font/google";
 import styles from "@/styles/home.module.css";
-import { useState } from "react";
+import Head from "next/head";
+import { useEffect, useState } from "react";
+import { FilterableProductsTable } from "./products_table";
 
-const inter = Inter({ subsets: ["latin"] });
+/**
+ * The Home component renders the main page of the application.
+ *
+ * It fetches the data from the server through the API and passes it to the
+ *
+ * FilterableProductsTable component to display the products in a filterable table.
+ *
+ * @returns {JSX.Element} A JSX Element that represents the Home component
+ */
+export default function Home(): JSX.Element {
+  const [products, setProducts] = useState([]);
 
-type API_RESPONSE = {
-  category: string;
-  price: string;
-  stocked: boolean;
-  name: string;
-};
+  useEffect(() => {
+    // request data from the api
+    const fetchProducts = async () => {
+      const response = await fetch("../api/products");
+      const data = await response.json();
+      setProducts(data); // set the fetched data to the state
+    };
 
-const PRODUCTS = [
-  { category: "Fruits", price: "$1", stocked: true, name: "Apple" },
-  { category: "Fruits", price: "$1", stocked: true, name: "Dragonfruit" },
-  { category: "Fruits", price: "$2", stocked: false, name: "Passionfruit" },
-  { category: "Vegetables", price: "$2", stocked: true, name: "Spinach" },
-  { category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin" },
-  { category: "Vegetables", price: "$1", stocked: true, name: "Peas" },
-] satisfies Array<API_RESPONSE>;
+    fetchProducts();
+  }, []);
 
-export default function Home() {
   return (
     <>
       <Head>
@@ -31,153 +35,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={`${styles.main} ${inter.className}`}>
-        <FilterableProductsTable products={PRODUCTS} />
+      <main className={styles.main}>
+        <FilterableProductsTable products={products} />
       </main>
     </>
   );
-}
-
-function FilterableProductsTable({
-  products,
-}: {
-  products: Array<API_RESPONSE>;
-}) {
-  const [filterText, setFilterText] = useState("");
-  const [inStockOnly, setInStockOnly] = useState(false);
-
-  return (
-    <>
-      <SearchBar
-        filterText={filterText}
-        inStockOnly={inStockOnly}
-        onFilterTextChange={setFilterText}
-        onInStockOnlyChange={setInStockOnly}
-      />
-      <ProductsTable
-        products={products}
-        filterText={filterText}
-        inStockOnly={inStockOnly}
-      />
-    </>
-  );
-}
-
-function SearchBar({
-  filterText,
-  inStockOnly,
-  onFilterTextChange,
-  onInStockOnlyChange,
-}: {
-  filterText: string;
-  inStockOnly: boolean;
-  onFilterTextChange: (filterText: string) => void;
-  onInStockOnlyChange: (inStockOnly: boolean) => void;
-}) {
-  return (
-    <form className={styles.searchBar}>
-      <input
-        type="text"
-        value={filterText}
-        placeholder="Search..."
-        onChange={(e) => onFilterTextChange(e.target.value)}
-      />
-      <label>
-        <input
-          type="checkbox"
-          checked={inStockOnly}
-          onChange={(e) => onInStockOnlyChange(e.target.checked)}
-        />{" "}
-        Only show products in stock
-      </label>
-    </form>
-  );
-}
-
-function ProductsTable({
-  products,
-  filterText,
-  inStockOnly,
-}: {
-  products: Array<API_RESPONSE>;
-  filterText: string;
-  inStockOnly: boolean;
-}) {
-  let rows: Array<JSX.Element> = filterProducts(
-    products,
-    filterText,
-    inStockOnly
-  );
-
-  return (
-    <table className={styles.productsTable}>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Price</th>
-        </tr>
-      </thead>
-      <tbody>{rows}</tbody>
-    </table>
-  );
-}
-
-function ProductCategoryRow({ category }: { category: string }) {
-  return (
-    <tr>
-      <th colSpan={2}>{category}</th>
-    </tr>
-  );
-}
-
-function ProductRow({ product }: { product: API_RESPONSE }) {
-  const name = product.stocked ? (
-    product.name
-  ) : (
-    <span style={{ color: "red" }}>{product.name}</span>
-  );
-
-  return (
-    <tr>
-      <td>{name}</td>
-      <td>{product.price}</td>
-    </tr>
-  );
-}
-
-function filterProducts(
-  products: Array<API_RESPONSE>,
-  filterText: string,
-  inStockOnly: boolean
-): Array<JSX.Element> {
-  let rows: Array<JSX.Element> = [];
-
-  let filter = filterText.toLowerCase();
-  let lastCategory = "";
-
-  products.forEach((product) => {
-    let name = product.name.toLowerCase();
-
-    if (name.indexOf(filter) === -1) {
-      return;
-    }
-
-    if (inStockOnly && !product.stocked) {
-      return;
-    }
-
-    if (product.category !== lastCategory) {
-      rows.push(
-        <ProductCategoryRow
-          category={product.category}
-          key={product.category}
-        />
-      );
-    }
-
-    rows.push(<ProductRow product={product} key={name} />);
-    lastCategory = product.category;
-  });
-
-  return rows;
 }
