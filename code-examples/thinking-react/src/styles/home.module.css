@@ -1,0 +1,38 @@
+.main {
+  padding: 6rem;
+  min-height: 100vh;
+
+  display: grid;
+  justify-content: center;
+  align-content: start;
+}
+
+.searchBar {
+  display: flex;
+  flex-flow: column;
+  margin-bottom: 1em;
+}
+
+.searchBar input[type="text"] {
+  border-radius: 1em;
+  float: right;
+  border: none;
+  font-size: 1em;
+  padding: 1em;
+  margin-bottom: 0.5em;
+}
+
+.productsTable table,
+.productsTable th,
+.productsTable td {
+  border: 1px solid white;
+  margin: -1em;
+  padding: 0.5em;
+}
+
+.grid {
+  display: grid;
+  justify-content: center;
+  width: var(--max-width);
+  max-width: 100%;
+}
