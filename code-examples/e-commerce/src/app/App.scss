@@ -7,11 +7,16 @@
 
 body {
   font-family: "Raleway", sans-serif;
+  margin: 0;
+}
 
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 1rem;
+    height: 1rem;
   }
 }

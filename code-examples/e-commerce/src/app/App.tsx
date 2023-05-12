@@ -1,17 +1,17 @@
 import "./App.scss";
-import Logo from "@/assets/logo.svg";
+import Logo from "@/components/Logo";
 
-function App() {
+import Navbar from "@/components/Navbar";
+
+export default function App() {
+  const sections = ["About", "Services", "Contact"];
+
   return (
     <>
-      <h1> Welcome! </h1>
-      <img src={Logo} className="logo" alt="Logo" />
+      <Navbar sections={sections} />
+      <h1 className="title">
+        <Logo /> Sintonia
+      </h1>
     </>
   );
 }
-
-export function sum(a: number, b: number) {
-  return a + b;
-}
-
-export default App;

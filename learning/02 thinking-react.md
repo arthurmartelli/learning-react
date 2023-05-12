@@ -19,13 +19,13 @@ The API returns data that looks like this:
     "category": "Fruits",
     "price": "$1",
     "stocked": true,
-    "name": "Dragonfruit"
+    "name": "Dragon-fruit"
   },
   {
     "category": "Fruits",
     "price": "$2",
     "stocked": false,
-    "name": "Passionfruit"
+    "name": "Passion-fruit"
   },
   {
     "category": "Vegetables",
@@ -95,42 +95,42 @@ To make a UI interactive, users need to be able to change the underlying data mo
 Identifying the states the application needs can be done as follows:
 
 1. Think of the pieces of data in the application:
-  - The original list of products.
-  - The search text the user has entered.
-  - The value of the checkbox.
-  - The filtered list of products.
+   - The original list of products.
+   - The search text the user has entered.
+   - The value of the checkbox.
+   - The filtered list of products.
 2. Identify what's not a state:
-  - Does it remain unchanged over time? If so, it is not a state.
-  - Is it passed in from a parent via proprs? If so, it is not a state.
-  - Can you compute it based on existing state or props in your component? If so, it is not a state.
+   - Does it remain unchanged over time? If so, it is not a state.
+   - Is it passed in from a parent via props? If so, it is not a state.
+   - Can you compute it based on existing state or props in your component? If so, it is not a state.
 3. Obtain the states:
-  - [ ] The original list of products is a prop.
-  - [x] The search text changes over time, is not a prop, and cant be computed.
-  - [x] The value of the checkbox changes over time, is not a prop, and cant be computed.
-  - [ ] The filtered list can be computed by other values.
+   - [ ] The original list of products is a prop.
+   - [x] The search text changes over time, is not a prop, and cant be computed.
+   - [x] The value of the checkbox changes over time, is not a prop, and cant be computed.
+   - [ ] The filtered list can be computed by other values.
 
 So only the search box and the checkbox are states.
 
 ## Step 4: Identify where your state should live
 
-After identifying the app's minimal state you need to identify wich component needs to own the state. Remember that React uses one-way data flows, passing down data down in the hierarchy. For each piece of state in the application:
+After identifying the app's minimal state you need to identify which component needs to own the state. Remember that React uses one-way data flows, passing down data down in the hierarchy. For each piece of state in the application:
 
 1. Identify every component that renders something based on that state.
-2. Finde their closest common parent component.
+2. Find their closest common parent component.
 3. Decide where the state should live:
-  1. It often can live directly in the common parent.
-  2. Or also in some component above the common parent.
-  3. If there is no component where it makes sense to own the state, create a new component above the common parent solely for holding the state.
+4. It often can live directly in the common parent.
+5. Or also in some component above the common parent.
+6. If there is no component where it makes sense to own the state, create a new component above the common parent solely for holding the state.
 
 In the previous step, you found 2 pieces of state in this application: the search input text, and the value of the checkbox. In the application, they always appear together, so it makes sense to put them into the same place.
 
 1. Identify the components that use state:
-  - `ProductTable` needs to filter the product list based on that state (search text + checkbox value).
-  - `SearchBar` needs to display that state (search text + checkbox value).
-2. Fint their common parent: The first common parent is `FilterableProductTable`.
+   - `ProductTable` needs to filter the product list based on that state (search text + checkbox value).
+   - `SearchBar` needs to display that state (search text + checkbox value).
+2. Find their common parent: The first common parent is `FilterableProductTable`.
 3. Decide where the state lives: it will live in `FilterableProductTable`.
 
-Add state to the component with the [`useState()` hook](https://react.dev/reference/react/useState). 
+Add state to the component with the [`useState()` hook](https://react.dev/reference/react/useState).
 
 ```typescript
 function FilterableProductTable({ products }) {
@@ -145,13 +145,12 @@ Then pass the states as props to each component:
 
 ```tsx
 <div>
-  <SearchBar 
-    filterText={filterText} 
-    inStockOnly={inStockOnly} />
-  <ProductsTable 
+  <SearchBar filterText={filterText} inStockOnly={inStockOnly} />
+  <ProductsTable
     products={products}
     filterText={filterText}
-    inStockOnly={inStockOnly} />
+    inStockOnly={inStockOnly}
+  />
 </div>
 ```
 
@@ -166,11 +165,11 @@ And inside the `SearchBar` you will add the `onChange` event handlers and set th
 ```jsx
 function FilterableProductTable({ products }) {
   ...
-  
+
   return (
-  
-    <SearchBar 
-      filterText={filterText} 
+
+    <SearchBar
+      filterText={filterText}
       inStockOnly={inStockOnly}
       onFilterTextChange={setFilterText}
       onInStockOnlyChange={setInStockOnly} />
@@ -180,11 +179,12 @@ function FilterableProductTable({ products }) {
 ```
 
 ```jsx
-<input 
-  type="text" 
-  value={filterText} 
-  placeholder="Search..." 
-  onChange={(e) => onFilterTextChange(e.target.value)} />
+<input
+  type="text"
+  value={filterText}
+  placeholder="Search..."
+  onChange={(e) => onFilterTextChange(e.target.value)}
+/>
 ```
 
 Now the application fully works!
