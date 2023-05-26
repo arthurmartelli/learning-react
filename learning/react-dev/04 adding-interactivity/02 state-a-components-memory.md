@@ -76,9 +76,9 @@ Every time your component renders, useState gives you an array containing two va
 
 Here’s how that happens in action:
 
-1. Your component renders the first time. Because you passed 0 to useState as the initial value for index, it will return [0, setIndex]. React remembers 0 is the latest state value.
-2. You update the state. When a user clicks the button, it calls setIndex(index + 1). index is 0, so it’s setIndex(1). This tells React to remember index is 1 now and triggers another render.
-3. Your component’s second render. React still sees useState(0), but because React remembers that you set index to 1, it returns [1, setIndex] instead.
+1. Your component renders the first time. Because you passed `0` to `useState` as the initial value for index, it will `return [0, setIndex]`. React remembers `0` is the latest state value.
+2. You update the state. When a user clicks the button, it calls `setIndex(index + 1)`. index is `0`, so it’s `setIndex(1)`. This tells React to remember index is `1` now and triggers another render.
+3. Your component’s second render. React still sees `useState(0)`, but because React remembers that you set index to `1`, it `returns [1, setIndex]` instead.
 4. And so on!
 
 ## Giving a component multiple state variables
