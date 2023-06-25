@@ -1,0 +1,4 @@
+.postCard {
+  opacity: 0.5;
+  transition: opacity 2s ease;
+}

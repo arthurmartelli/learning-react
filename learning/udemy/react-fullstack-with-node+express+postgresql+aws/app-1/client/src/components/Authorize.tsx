@@ -1,0 +1,64 @@
+import { useAuth0 } from "@auth0/auth0-react";
+import { Dispatch } from "@reduxjs/toolkit";
+import { useEffect } from "react";
+import { ACTIONS } from "../store/actions/actions";
+import { DB_PROFILE, PROFILE } from "../store/actions/action_types";
+import { Props } from "../store/reducers";
+import { connect } from "react-redux";
+import axios, { AxiosResponse } from "axios";
+
+type AuthorizeProps = ReturnType<typeof mapStateToProps>;
+type AuthorizeDispatchProps = ReturnType<typeof mapDispatchToProps>;
+
+async function send_profile_to_db(user: DB_PROFILE, sender: Function) {
+  await axios.post("/api/users", user);
+
+  axios
+    .get("/api/users", {
+      params: { email: user.email },
+    })
+    .then((res: AxiosResponse<DB_PROFILE[]>) => sender(res.data[0]));
+}
+
+const Authorize = (props: AuthorizeProps & AuthorizeDispatchProps) => {
+  const { user, isAuthenticated } = useAuth0();
+
+  useEffect(() => {
+    if (isAuthenticated && user !== null && user !== undefined) {
+      props.login_success();
+      props.add_profile(user);
+      const db_user = {
+        username: user.nickname,
+        email: user.email,
+        email_verified: user.email_verified,
+      } satisfies DB_PROFILE;
+
+      send_profile_to_db(db_user, props.set_db_profile);
+    } else {
+      props.login_failure();
+      props.remove_profile();
+    }
+  }, [user, isAuthenticated]);
+
+  return isAuthenticated ? (
+    <>You are authorized</>
+  ) : (
+    <>You are not authorized</>
+  );
+};
+
+function mapDispatchToProps(dispatch: Dispatch) {
+  return {
+    login_success: () => dispatch(ACTIONS.login_success()),
+    login_failure: () => dispatch(ACTIONS.login_failure()),
+    add_profile: (p: PROFILE) => dispatch(ACTIONS.add_profile(p)),
+    remove_profile: () => dispatch(ACTIONS.remove_profile()),
+    set_db_profile: (p: DB_PROFILE) => dispatch(ACTIONS.set_db_profile(p)),
+  };
+}
+
+function mapStateToProps(state: Props) {
+  return state;
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Authorize);

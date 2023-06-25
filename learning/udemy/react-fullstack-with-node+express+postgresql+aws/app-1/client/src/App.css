@@ -1,0 +1,26 @@
+.flexProfileDrawer {
+  display: flex;
+  flex-direction: row;
+  margin: 20px -90px 0 25px;
+}
+
+.flexProfileDrawer > h1 {
+  text-align: center;
+}
+
+.flexProfileDrawerRow {
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+  padding: auto 10px;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}

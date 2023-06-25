@@ -1,9 +1,5 @@
-import React from 'react'
+import React from "react";
 
-const UnauthRedirect = props => (
-    <div>
-      UnauthRedirect
-    </div>
-);
+const UnauthRedirect = (props) => <div>UnauthRedirect</div>;
 
 export default UnauthRedirect;
