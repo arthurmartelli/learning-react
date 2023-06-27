@@ -1,4 +1,4 @@
-import { DB_PROFILE, PROFILE } from "../actions/action_types"
+import { DB_PROFILE, PROFILE } from "../../data"
 import { ACTION, ACTION_TYPES } from "../actions/actions"
 
 type authState = {

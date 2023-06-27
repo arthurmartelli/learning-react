@@ -2,26 +2,19 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Dispatch } from "@reduxjs/toolkit";
 import { useEffect } from "react";
 import { ACTIONS } from "../store/actions/actions";
-import { DB_PROFILE, PROFILE } from "../store/actions/action_types";
+import { DB_PROFILE, PROFILE } from "../data";
 import { Props } from "../store/reducers";
 import { connect } from "react-redux";
 import axios, { AxiosResponse } from "axios";
+import { send_profile_to_db } from "../data/db_users";
+import { useNavigate } from "react-router-dom";
 
 type AuthorizeProps = ReturnType<typeof mapStateToProps>;
 type AuthorizeDispatchProps = ReturnType<typeof mapDispatchToProps>;
 
-async function send_profile_to_db(user: DB_PROFILE, sender: Function) {
-  await axios.post("/api/users", user);
-
-  axios
-    .get("/api/users", {
-      params: { email: user.email },
-    })
-    .then((res: AxiosResponse<DB_PROFILE[]>) => sender(res.data[0]));
-}
-
 const Authorize = (props: AuthorizeProps & AuthorizeDispatchProps) => {
   const { user, isAuthenticated } = useAuth0();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated && user !== null && user !== undefined) {
@@ -33,18 +26,16 @@ const Authorize = (props: AuthorizeProps & AuthorizeDispatchProps) => {
         email_verified: user.email_verified,
       } satisfies DB_PROFILE;
 
-      send_profile_to_db(db_user, props.set_db_profile);
+      send_profile_to_db(db_user, props.set_db_profile).then(() =>
+        navigate("/profile")
+      );
     } else {
       props.login_failure();
       props.remove_profile();
     }
   }, [user, isAuthenticated]);
 
-  return isAuthenticated ? (
-    <>You are authorized</>
-  ) : (
-    <>You are not authorized</>
-  );
+  return <></>;
 };
 
 function mapDispatchToProps(dispatch: Dispatch) {

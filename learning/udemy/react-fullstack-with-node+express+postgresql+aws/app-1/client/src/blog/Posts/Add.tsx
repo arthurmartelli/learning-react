@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import { FormEvent, useState } from "react";
 import { connect } from "react-redux";
 import { Props } from "../../store/reducers";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button, TextField } from "@mui/material";
-
-type Event = React.FormEvent<HTMLFormElement>;
+import { add_post } from "../../data/posts";
+import { checkObjectProperties } from "../../utils/validateData";
 
 function AddPost(props: Props) {
   const { db_profile } = props.auth_reducer;
@@ -13,21 +12,22 @@ function AddPost(props: Props) {
   const [body, setBody] = useState("");
   const navigate = useNavigate();
 
-  function handleSubmit(event: Event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = {
-      title: title,
-      body: body,
-      user_id: db_profile?.uid,
+      title: title || "",
+      body: body || "",
+      user_id: db_profile?.uid || "",
     };
 
-    axios
-      .post("/api/posts", data)
+    if (!checkObjectProperties(data)) return;
+
+    add_post(data)
       .then((res) => {
         console.log(res);
       })
       .catch((err) => console.log(err))
-      .then(() => navigate("/"));
+      .then(() => navigate("/profile/"));
 
     return false;
   }

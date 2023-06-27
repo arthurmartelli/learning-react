@@ -1,4 +1,4 @@
-import { COMMENT, POST } from "../actions/action_types"
+import { COMMENT, POST } from "../../data"
 import { ACTION, ACTION_TYPES } from "../actions/actions"
 
 type postState = {

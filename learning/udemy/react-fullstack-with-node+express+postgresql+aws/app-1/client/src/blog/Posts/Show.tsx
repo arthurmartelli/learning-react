@@ -2,75 +2,55 @@ import { useEffect, useState, FormEvent } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Props } from "../../store/reducers";
-import { COMMENT, DB_PROFILE, POST } from "../../store/actions/action_types";
-import { get_user_from_db } from "../../utils/utils";
+import { COMMENT, DB_PROFILE, POST } from "../../data";
+import { get_user_from_db } from "../../data/db_users";
 import { Button, TextField } from "@mui/material";
-import axios, { AxiosResponse } from "axios";
 import { ACTIONS } from "../../store/actions/actions";
 import { useLocation, useNavigate } from "react-router-dom";
-import RenderComment from "../RenderComment";
+import { ShowComments } from "../Comments";
+import {
+  get_post_comments,
+  get_unique_comments,
+  post_comment,
+} from "../../data/comments";
+import { checkObjectProperties } from "../../utils/validateData";
 
 type ShowPostProps = ReturnType<typeof mapStateToProps> &
   ReturnType<typeof mapDispatchToProps>;
 
-export const ShowPost = (props: ShowPostProps) => {
+function Show(props: ShowPostProps) {
   const { state }: { state: POST } = useLocation();
   const post = state;
-  const pid = post.pid;
+  const pid = post.pid || "";
 
   const navigate = useNavigate();
+  const [comments, setComments] = useState([] as COMMENT[]);
   const [user, setUser] = useState<DB_PROFILE | null>(null);
 
   useEffect(() => {
-    axios
-      .get("/api/comments", { params: { post_id: pid } })
-      .then((res: AxiosResponse<COMMENT[]>) => {
-        const uniqueComments: COMMENT[] = Array.from(
-          new Set(res.data.map((comment) => comment.cid))
-        )
-          .map((cid) => {
-            return res.data.find((comment) => comment.cid === cid)!;
-          })
-          .filter((comment) => comment !== undefined);
-
-        props.update_comments(uniqueComments);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    get_post_comments(pid).then((res) => {
+      setComments(get_unique_comments(res.data));
+    });
   }, []);
 
   useEffect(() => {
     get_user_from_db(post.user_id || "")
-      .then((user) => {
-        setUser(user);
-      })
-      .catch((error) => {
-        console.error(error);
-        // Handle the error if needed
-      });
+      .then((user) => setUser(user))
+      .catch((error) => console.error(error));
   }, []);
 
   function handleSubmitNewComment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = {
-      body: event.currentTarget.comment.value,
-      user_id: props.user_id,
-      post_id: pid,
+      body: event.currentTarget.comment.value || "",
+      user_id: props.user_id || "",
+      post_id: pid || "",
     };
 
-    axios
-      .post("/api/comments", data)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err))
-      .then(() => navigate("/posts"));
+    if (!checkObjectProperties(data)) return;
+    post_comment(data);
+    navigate("/posts");
   }
-
-  const uniqueComments = Array.from(
-    new Set(props.comments.map((comment) => comment.cid))
-  ).map((cid) => {
-    return props.comments.find((comment) => comment.cid === cid);
-  });
 
   return (
     <>
@@ -81,8 +61,8 @@ export const ShowPost = (props: ShowPostProps) => {
 
       {/* Comments Section */}
       <h2>Comments</h2>
-      {uniqueComments.map((comment) => (
-        <RenderComment
+      {comments.map((comment) => (
+        <ShowComments
           key={comment?.cid}
           comment={comment || {}}
           user_id={props.user_id || ""}
@@ -96,7 +76,7 @@ export const ShowPost = (props: ShowPostProps) => {
       </form>
     </>
   );
-};
+}
 
 const mapStateToProps = (state: Props) => ({
   posts: state.post_reducer.posts,
@@ -109,4 +89,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch(ACTIONS.update_comments(comment)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ShowPost);
+export default connect(mapStateToProps, mapDispatchToProps)(Show);

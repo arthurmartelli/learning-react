@@ -1,4 +1,4 @@
-import { COMMENT, DB_PROFILE, POST, PROFILE } from "./action_types"
+import { COMMENT, DB_PROFILE, POST, PROFILE } from "../../data"
 
 export enum ACTION_TYPES {
     "LOGIN_SUCCESS",

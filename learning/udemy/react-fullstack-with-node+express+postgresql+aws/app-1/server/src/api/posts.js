@@ -3,14 +3,12 @@ const router = express.Router();
 const { pool } = require("../../db");
 
 router.get("", (req, res, next) => {
-  console.log("RETURNING ALL POSTS");
   pool.query("SELECT * FROM posts ORDER BY created_at DESC", (err, result) => {
     res.json(result.rows);
   });
 });
 
 router.post("", (req, res, next) => {
-  console.log(`CREATING POST: ${req.body.title}`);
   const values = [req.body.title, req.body.body, req.body.user_id];
 
   pool.query(
@@ -38,7 +36,7 @@ router.put("", (req, res, next) => {
 
   pool.query(
     `UPDATE posts
-    SET title = $1, body = $2, user_id = $3, created_at=NOW()
+    SET title = $1, body = $2, user_id = $3, created_at = NOW()
     WHERE pid = $4`,
     values,
     (err, result) => {

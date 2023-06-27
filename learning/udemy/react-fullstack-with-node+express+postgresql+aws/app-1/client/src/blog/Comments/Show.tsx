@@ -10,79 +10,61 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
-import { COMMENT, DB_PROFILE } from "../store/actions/action_types";
-import { get_user_from_db } from "../utils/utils";
-import axios from "axios";
+import { COMMENT, DB_PROFILE } from "../../data";
+import { get_user_from_db } from "../../data/db_users";
 import { useNavigate } from "react-router-dom";
+import { delete_comment, edit_comment } from "../../data/comments";
+import { checkObjectProperties } from "../../utils/validateData";
 
 type RenderCommentProps = {
   comment: COMMENT;
   user_id: string;
 };
 
-const RenderComment: React.FC<RenderCommentProps> = ({ comment, user_id }) => {
-  const [user, setUser] = useState<DB_PROFILE | null>(null);
+function Show({ comment, user_id }: RenderCommentProps) {
+  const [user, setUser] = useState<DB_PROFILE>({});
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [editedComment, setEditedComment] = useState(comment.body);
   const navigate = useNavigate();
 
-  const handleEditComment = () => {
+  useEffect(() => {
+    if (comment.user_id === undefined) return;
+
+    get_user_from_db(comment.user_id)
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [comment.user_id]);
+
+  const handleEditComment = async () => {
     const data = {
-      body: editedComment,
-      user_id: comment.user_id,
-      post_id: comment.post_id,
-      cid: comment.cid,
+      body: editedComment || "",
+      user_id: comment.user_id || "",
+      post_id: comment.post_id || "",
+      cid: comment.cid || "",
     };
 
-    axios.put("/api/comments", data).then((res) => {});
+    if (!checkObjectProperties(data)) return;
 
-    // Close the dialog after updating the comment
+    await edit_comment(data);
     setOpenEditDialog(false);
   };
 
-  const handleDeleteComment = () => {
-    // Perform the API request to update the comment
-    axios
-      .delete("/api/comments", {
-        params: {
-          cid: comment.cid,
-        },
-      })
-      .then((res) => navigate("/posts"));
-
-    // Close the dialog after updating the comment
+  const handleDeleteComment = async () => {
     setOpenDeleteDialog(false);
-  };
-
-  const handleOpenEditDialog = () => {
-    setOpenEditDialog(true);
+    if (comment.cid === "" || comment.cid === undefined) return;
+    await delete_comment(comment.cid);
+    navigate("/posts");
   };
 
   const handleCloseEditDialog = () => {
     setEditedComment(comment.body);
     setOpenEditDialog(false);
   };
-
-  const handleOpenDeleteDialog = () => {
-    setOpenDeleteDialog(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-  };
-
-  // Fetch user information
-  useEffect(() => {
-    get_user_from_db(comment.user_id || "")
-      .then((user) => {
-        setUser(user);
-      })
-      .catch((error) => {
-        console.error(error);
-        // Handle the error if needed
-      });
-  }, [comment.user_id]);
 
   return (
     <Card key={comment.cid} variant="outlined">
@@ -94,7 +76,7 @@ const RenderComment: React.FC<RenderCommentProps> = ({ comment, user_id }) => {
             <Typography variant="body1">By: {user.username}</Typography>
             {comment.user_id === user_id ? (
               <>
-                <Button onClick={handleOpenEditDialog}>Edit</Button>
+                <Button onClick={() => setOpenEditDialog(true)}>Edit</Button>
                 <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
                   <DialogTitle>Edit Comment</DialogTitle>
                   <DialogContent>
@@ -111,15 +93,19 @@ const RenderComment: React.FC<RenderCommentProps> = ({ comment, user_id }) => {
                   </DialogActions>
                 </Dialog>
 
-                <Button onClick={handleOpenDeleteDialog}>Delete</Button>
+                <Button onClick={() => setOpenDeleteDialog(true)}>
+                  Delete
+                </Button>
                 <Dialog
                   open={openDeleteDialog}
-                  onClose={handleCloseDeleteDialog}
+                  onClose={() => setOpenDeleteDialog(false)}
                 >
                   <DialogTitle>Delete Comment</DialogTitle>
                   <DialogActions>
                     <Button onClick={handleDeleteComment}>Delete</Button>
-                    <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)}>
+                      Cancel
+                    </Button>
                   </DialogActions>
                 </Dialog>
               </>
@@ -132,6 +118,6 @@ const RenderComment: React.FC<RenderCommentProps> = ({ comment, user_id }) => {
       </CardContent>
     </Card>
   );
-};
+}
 
-export default RenderComment;
+export default Show;

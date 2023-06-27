@@ -6,9 +6,9 @@ import App from "./App";
 import { AddPost, AllPost, EditPost, ShowPost } from "./blog/Posts";
 import Authorize from "./components/Authorize";
 import Header from "./components/Header";
-import Profile from "./components/Profile";
+import Profile from "./blog/Profile/Profile";
 import { ACTIONS } from "./store/actions";
-import { PROFILE } from "./store/actions/action_types";
+import { PROFILE } from "./data";
 import { Props } from "./store/reducers";
 
 type AppRouterProps = Props;

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ACTIONS } from "../../store/actions/actions";
-import { COMMENT, POST } from "../../store/actions/action_types";
+import { COMMENT, POST } from "../../data";
 import { Props } from "../../store/reducers";
 import { Dispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
 import { TextField, Button } from "@mui/material";
-import axios from "axios";
+import { edit_post } from "../../data/posts";
+import { checkObjectProperties } from "../../utils/validateData";
 
 type EditPostsProps = ReturnType<typeof mapStateToProps> &
   ReturnType<typeof mapDispatchToProps>;
@@ -24,55 +25,55 @@ function EditPost(props: EditPostsProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = {
-      title,
-      body,
-      user_id: props.db_profile?.uid,
-      pid: post.pid,
+      title: title || "",
+      body: body || "",
+      user_id: props.db_profile?.uid || "",
+      pid: post.pid || "",
     };
 
-    await axios.put("/api/posts", data);
-    navigate(`/profile`);
+    if (!checkObjectProperties(data)) return;
+
+    await edit_post(data);
+    navigate(`/posts/${post.pid}`);
   };
 
-  return (
+  return editable ? (
     <>
-      {editable && (
-        <>
-          <form
-            onSubmit={async (e) => {
-              handleSubmit(e);
-            }}
-          >
-            <TextField
-              id="title"
-              label="Title"
-              margin="normal"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <br />
-            <TextField
-              id="body"
-              label="Body"
-              margin="normal"
-              multiline
-              rows={4}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-            />
-            <br />
-            <Button type="submit" variant="contained">
-              Save
-            </Button>
-          </form>
-          <br />
+      <form
+        onSubmit={async (e) => {
+          handleSubmit(e);
+        }}
+      >
+        <TextField
+          id="title"
+          label="Title"
+          margin="normal"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <br />
+        <TextField
+          id="body"
+          label="Body"
+          margin="normal"
+          multiline
+          rows={4}
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+        />
+        <br />
+        <Button type="submit" variant="contained">
+          Save
+        </Button>
+      </form>
+      <br />
 
-          <Button onClick={() => navigate("/profile")} variant="contained">
-            Cancel
-          </Button>
-        </>
-      )}
+      <Button onClick={() => navigate("/profile")} variant="contained">
+        Cancel
+      </Button>
     </>
+  ) : (
+    <>You are unauthorized to edit this post</>
   );
 }
 
