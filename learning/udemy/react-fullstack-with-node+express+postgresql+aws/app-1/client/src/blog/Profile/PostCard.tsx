@@ -16,19 +16,19 @@ function PostCard({ post }: { post: POST }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const navigate = useNavigate();
 
-  const handleDeletePost = async () => {
+  async function handleDeletePost() {
     if (!post.pid) return;
     delete_post(post.pid);
     setOpenDeleteDialog(false);
     navigate("/profile");
-  };
+  }
 
   return (
     <>
-      <Card style={{ width: "18rem" }}>
+      <Card style={{ width: "100vw" }}>
         <CardHeader
           title={
-            <Link to={{ pathname: `/posts/edit/${post.pid}` }} state={post}>
+            <Link to={`/posts/edit/${post.pid}`} state={post}>
               {post.title}
             </Link>
           }
@@ -54,6 +54,7 @@ function PostCard({ post }: { post: POST }) {
         onClose={() => setOpenDeleteDialog(false)}
       >
         <DialogTitle>Delete Comment</DialogTitle>
+
         <DialogActions>
           <Button onClick={handleDeletePost}>Delete</Button>
           <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>

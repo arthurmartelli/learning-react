@@ -12,24 +12,16 @@ function AddPost(props: Props) {
   const [body, setBody] = useState("");
   const navigate = useNavigate();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = {
       title: title || "",
       body: body || "",
       user_id: db_profile?.uid || "",
     };
-
     if (!checkObjectProperties(data)) return;
-
-    add_post(data)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => console.log(err))
-      .then(() => navigate("/profile/"));
-
-    return false;
+    await add_post(data);
+    navigate("/profile");
   }
 
   return (
@@ -58,7 +50,7 @@ function AddPost(props: Props) {
         </Button>
       </form>
       <br />
-      <Button onClick={() => navigate("/")} variant="contained">
+      <Button onClick={() => navigate("/posts")} variant="contained">
         Cancel
       </Button>
     </>

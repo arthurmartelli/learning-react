@@ -1,28 +1,24 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ACTIONS } from "../../store/actions/actions";
-import { COMMENT, POST } from "../../data";
+import { POST } from "../../data";
 import { Props } from "../../store/reducers";
-import { Dispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
 import { TextField, Button } from "@mui/material";
 import { edit_post } from "../../data/posts";
 import { checkObjectProperties } from "../../utils/validateData";
 
-type EditPostsProps = ReturnType<typeof mapStateToProps> &
-  ReturnType<typeof mapDispatchToProps>;
+type EditPostsProps = ReturnType<typeof mapStateToProps>;
 
 function EditPost(props: EditPostsProps) {
   const { state }: { state: POST } = useLocation();
   const navigate = useNavigate();
   const post = state;
-
-  const [title, setTitle] = useState(post ? post.title : "");
-  const [body, setBody] = useState(post ? post.body : "");
-
   const editable = post ? post.user_id === props.db_profile?.uid : false;
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const [title, setTitle] = useState(post.title);
+  const [body, setBody] = useState(post.body);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = {
       title: title || "",
@@ -35,15 +31,11 @@ function EditPost(props: EditPostsProps) {
 
     await edit_post(data);
     navigate(`/posts/${post.pid}`);
-  };
+  }
 
   return editable ? (
     <>
-      <form
-        onSubmit={async (e) => {
-          handleSubmit(e);
-        }}
-      >
+      <form onSubmit={(e) => handleSubmit(e)}>
         <TextField
           id="title"
           label="Title"
@@ -83,9 +75,4 @@ const mapStateToProps = (state: Props) => ({
   db_profile: state.auth_reducer.db_profile,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-  update_comments: (comment: COMMENT[]) =>
-    dispatch(ACTIONS.update_comments(comment)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(EditPost);
+export default connect(mapStateToProps)(EditPost);

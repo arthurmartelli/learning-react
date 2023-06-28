@@ -5,7 +5,6 @@ import { ACTIONS } from "../store/actions/actions";
 import { DB_PROFILE, PROFILE } from "../data";
 import { Props } from "../store/reducers";
 import { connect } from "react-redux";
-import axios, { AxiosResponse } from "axios";
 import { send_profile_to_db } from "../data/db_users";
 import { useNavigate } from "react-router-dom";
 

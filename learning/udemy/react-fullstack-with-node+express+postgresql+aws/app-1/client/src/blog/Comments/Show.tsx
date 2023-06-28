@@ -29,15 +29,11 @@ function Show({ comment, user_id }: RenderCommentProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (comment.user_id === undefined) return;
+    if (!comment.user_id) return;
 
-    get_user_from_db(comment.user_id)
-      .then((user) => {
-        setUser(user);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    get_user_from_db(comment.user_id).then((user) => {
+      setUser(user);
+    });
   }, [comment.user_id]);
 
   const handleEditComment = async () => {
@@ -49,14 +45,13 @@ function Show({ comment, user_id }: RenderCommentProps) {
     };
 
     if (!checkObjectProperties(data)) return;
-
     await edit_comment(data);
     setOpenEditDialog(false);
   };
 
   const handleDeleteComment = async () => {
     setOpenDeleteDialog(false);
-    if (comment.cid === "" || comment.cid === undefined) return;
+    if (!comment.cid) return;
     await delete_comment(comment.cid);
     navigate("/posts");
   };
